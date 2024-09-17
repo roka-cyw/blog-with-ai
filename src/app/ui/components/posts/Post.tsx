@@ -1,16 +1,13 @@
-import React, { JSX } from 'react'
+import React from 'react'
 
-export default function Component({
-  id,
-  title,
-  content,
-  date
-}: {
+interface Props {
   id: string
   title: string
   content: string
   date: string
-}) {
+}
+
+export default function Post({ id, title, content, date }: Props): JSX.Element {
   return (
     <div key={id} className='border border-gray-200 p-4 my-4'>
       <h2>{title}</h2>

@@ -42,7 +42,7 @@ async function seedPosts(client) {
 async function main() {
   const client = await db.connect()
   await seedPosts(client)
-  await client.end()
+  await client.release()
 }
 
 main().catch(err => {
