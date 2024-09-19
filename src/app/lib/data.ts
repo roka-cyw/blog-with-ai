@@ -1,4 +1,5 @@
 import { createClient } from '@vercel/postgres'
+import { unstable_noStore as noStore } from 'next/cache'
 import { sql } from '@vercel/postgres'
 
 export async function connectToDB() {
@@ -17,6 +18,7 @@ export async function connectToDB() {
 
 export async function getPosts() {
   try {
+    noStore()
     const data = await sql`SELECT * FROM posts LIMIT 20`
     console.log(data.rows)
     return data.rows
