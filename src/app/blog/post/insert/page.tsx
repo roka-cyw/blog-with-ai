@@ -1,11 +1,15 @@
 'use client'
-import React from 'react'
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+
+import React, { useState, useEffect } from 'react'
 import { v4 as uuidv4 } from 'uuid'
+import { useRouter } from 'next/navigation'
+import { getSession } from 'next-auth/react'
+
+import { User } from '../../../lib/definition'
 
 export default function Page() {
   const router = useRouter()
+  const [user, setUser] = useState<User | null>(null)
   const [formData, setFormData] = useState({
     id: '',
     title: '',
@@ -13,7 +17,7 @@ export default function Page() {
     date: new Date().toISOString().slice(0, 10)
   })
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setFormData(prevData => ({
       ...prevData,
@@ -21,16 +25,19 @@ export default function Page() {
     }))
   }
 
-  const handleSubmit = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSubmit = (e: React.ChangeEvent<HTMLFormElement>) => {
     e.preventDefault()
     const uuid = uuidv4()
-    fetch(`/api/posts?id=${uuid}&title=${formData.title}&content=${formData.content}&date=${formData.date}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ ...formData, id: uuid })
-    })
+    fetch(
+      `/api/posts?id=${uuid}&title=${formData.title}&author=${user?.name}&content=${formData.content}&date=${formData.date}`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ ...formData, id: uuid })
+      }
+    )
       .then(() => {
         // Clear form fields
         setFormData({
@@ -43,6 +50,10 @@ export default function Page() {
       })
       .catch(console.error)
   }
+
+  useEffect(() => {
+    getSession().then(session => setUser(session?.user || null))
+  }, [])
 
   return (
     <div className='bg-white p-8 rounded shadow'>
@@ -68,7 +79,7 @@ export default function Page() {
           <textarea
             id='content'
             name='content'
-            rows='4'
+            rows={4}
             value={formData.content}
             onChange={handleChange}
             className='w-full border-2 border-sky-100 p-2 rounded-md focus:border-sky-200 focus:outline-none'
