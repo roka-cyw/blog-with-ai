@@ -1,8 +1,8 @@
 import Link from 'next/link'
 
-import { connectToDB, getPosts } from '@/app/lib/data'
-import Post from '@/app/ui/components/posts/Post'
 import { Button } from '@/app/ui/components/button'
+import Post from '@/app/ui/components/posts/Post'
+import { connectToDB, getPosts } from '@/app/lib/data'
 
 export default async function Page() {
   const client = await connectToDB()
