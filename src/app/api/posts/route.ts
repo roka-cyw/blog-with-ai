@@ -1,5 +1,6 @@
 import { sql } from '@vercel/postgres'
 import { NextResponse } from 'next/server'
+import { auth } from '../../../../auth.config'
 
 export async function GET() {
   try {
@@ -11,6 +12,8 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const session = await auth()
+
   const { searchParams } = new URL(request.url)
   const id = searchParams.get('id')
   const title = searchParams.get('title')
@@ -19,6 +22,9 @@ export async function POST(request: Request) {
   const author = searchParams.get('author')
 
   try {
+    if (!session) {
+      return NextResponse.json({ message: 'Unathorized request' }, { status: 401 })
+    }
     // SQL query to insert a new post
     await sql`INSERT INTO posts (id, author, title, content, date) VALUES (${id}, ${author}, ${title}, ${content}, ${date})`
     return NextResponse.json({ message: 'Post successfully added' }, { status: 200 })
