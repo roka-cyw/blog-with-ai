@@ -22,7 +22,7 @@ export async function POST(request: Request) {
   const author = searchParams.get('author')
 
   try {
-    if (!session) {
+    if (!session?.user) {
       return NextResponse.json({ message: 'Unathorized request' }, { status: 401 })
     }
     // SQL query to insert a new post
